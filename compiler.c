@@ -199,6 +199,14 @@ static void emitBytes(uint8_t byte1, uint8_t byte2)
     emitByte(byte2);
 }
 
+static int emitJump(uint8_t instruction)
+{
+    emitByte(instruction);
+    emitByte(0xff);
+    emitByte(0xff);
+    return currentChunk()->count - 2;
+}
+
 static void emitReturn(void)
 {
     emitByte(OP_RETURN);
@@ -277,6 +285,18 @@ static void grouping(bool canAssign)
 static void emitConstant(Value value)
 {
     emitBytes(OP_CONSTANT, makeConstant(value));
+}
+
+static void patchJump(int offset)
+{
+    // -2 to adjust for the bytecode for the jump offset itself.
+    int jump = currentChunk()->count - offset - 2;
+
+    if (jump > UINT16_MAX)
+        error("Too much code to jump over.");
+
+    currentChunk()->code[offset] = (jump >> 8) & 0xff;
+    currentChunk()->code[offset + 1] = jump & 0xff;
 }
 
 static void initCompiler(Compiler *compiler)
@@ -442,6 +462,25 @@ static void expressionStatement(void)
     emitByte(OP_POP);
 }
 
+static void ifStatement(void)
+{
+    consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' afer condition.");
+
+    int thenJump = emitJump(OP_JUMP_IF_FALSE);
+    emitByte(OP_POP);
+    statement();
+
+    int elseJump = emitJump(OP_JUMP);
+
+    patchJump(thenJump);
+    emitByte(OP_POP);
+
+    if (match(TOKEN_ELSE)) statement();
+    patchJump(elseJump);
+}
+
 static void printStatement(void)
 {
     expression();
@@ -490,6 +529,8 @@ static void statement(void)
 {
     if (match(TOKEN_PRINT))
         printStatement();
+    else if (match(TOKEN_IF))
+        ifStatement();
     else if (match(TOKEN_LEFT_BRACE)) {
         beginScope();
         block();

@@ -20,6 +20,9 @@ static void parsePrecedence(Precedence precedence);
 static void error(const char *message);
 static void consume(TokenType type, const char *message);
 static void emitBytes(uint8_t byte1, uint8_t byte2);
+static int emitJump(uint8_t instruction);
+static void patchJump(int offset);
+static void emitByte(uint8_t byte);
 
 Parser parser;
 
@@ -123,6 +126,16 @@ static void defineVariable(uint8_t global)
     }
 
     emitBytes(OP_DEFINE_GLOBAL, global);
+}
+
+static void and_(bool canAssign)
+{
+	int endJump = emitJump(OP_JUMP_IF_FALSE);
+
+	emitByte(OP_POP);
+	parsePrecedence(PREC_AND);
+
+	patchJump(endJump);
 }
 
 static void errorAt(Token *token, const char *message)
@@ -312,6 +325,18 @@ static void number(bool canAssign)
     emitConstant(NUMBER_VAL(value));
 }
 
+static void or_(bool canAssign)
+{
+	int elseJump = emitJump(OP_JUMP_IF_FALSE);
+	int endJump = emitJump(OP_JUMP);
+
+	patchJump(elseJump);
+	emitByte(OP_POP);
+
+	parsePrecedence(PREC_OR);
+	patchJump(endJump);
+}
+
 static void string(bool canAssign)
 {
     emitConstant(OBJ_VAL(copyString(parser.previous.start + 1,
@@ -382,7 +407,7 @@ ParseRule rules[] = {
     { variable, NULL,    PREC_NONE },       // TOKEN_IDENTIFIER
     { string,   NULL,    PREC_NONE },       // TOKEN_STRING
     { number,   NULL,    PREC_NONE },       // TOKEN_NUMBER
-    { NULL,     NULL,    PREC_NONE },       // TOKEN_AND
+    { NULL,     and_,    PREC_AND  },       // TOKEN_AND
     { NULL,     NULL,    PREC_NONE },       // TOKEN_CLASS
     { NULL,     NULL,    PREC_NONE },       // TOKEN_ELSE
     { literal,  NULL,    PREC_NONE },       // TOKEN_FALSE
@@ -390,7 +415,7 @@ ParseRule rules[] = {
     { NULL,     NULL,    PREC_NONE },       // TOKEN_FUN
     { NULL,     NULL,    PREC_NONE },       // TOKEN_IF
     { literal,  NULL,    PREC_NONE },       // TOKEN_NIL
-    { NULL,     NULL,    PREC_NONE },       // TOKEN_OR
+    { NULL,      or_,	 PREC_OR   },       // TOKEN_OR
     { NULL,     NULL,    PREC_NONE },       // TOKEN_PRINT
     { NULL,     NULL,    PREC_NONE },       // TOKEN_RETURN
     { NULL,     NULL,    PREC_NONE },       // TOKEN_SUPER

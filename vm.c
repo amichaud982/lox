@@ -55,6 +55,11 @@ void push(Value value)
 Value pop(void)
 {
 	vm.stackTop--;
+#ifdef DEBUG_STACK
+    printf("Value popped off of stack: ");
+    printValue(*vm.stackTop);
+    printf("\n");
+#endif
 	return *vm.stackTop;
 }
 
@@ -221,6 +226,12 @@ static InterpretResult run(void)
             {
                 uint16_t offset = READ_SHORT();
                 if (isFalsey(peek(0))) vm.ip += offset;
+                break;
+            }
+            case OP_LOOP:
+            {
+                uint16_t offset = READ_SHORT();
+                vm.ip -= offset;
                 break;
             }
 			case OP_RETURN:

@@ -45,8 +45,9 @@ typedef enum
     TYPE_SCRIPT
 } FunctionType;
 
-typedef struct
+typedef struct Compiler_t
 {
+    struct Compiler_t *enclosing;
     ObjFunction *function;
     FunctionType type;
     Local locals[UINT8_COUNT];

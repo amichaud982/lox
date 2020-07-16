@@ -5,9 +5,9 @@
 #include "object.h"
 #include "vm.h"
 
-#define UINT8_COUNT (UINT8_MAX + 1)
+//#define UINT8_COUNT (UINT8_MAX + 1)
 
-bool compile(const char *source, Chunk *chunk);
+ObjFunction *compile(const char *source);
 
 typedef enum
 {
@@ -39,8 +39,16 @@ typedef struct
     int depth;
 } Local;
 
+typedef enum
+{
+    TYPE_FUNCTION,
+    TYPE_SCRIPT
+} FunctionType;
+
 typedef struct
 {
+    ObjFunction *function;
+    FunctionType type;
     Local locals[UINT8_COUNT];
     int localCount;
     int scopeDepth;

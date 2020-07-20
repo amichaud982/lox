@@ -156,6 +156,30 @@ static void traceReferences(void)
     }
 }
 
+static void sweep(void)
+{
+    Obj *previous = NULL;
+    Obj *object = vm.objects;
+    while (object) {
+        if (object->isMarked) {
+            object->isMarked = false;
+            previous = object;
+            object = object->next;
+        } 
+        else {
+            Obj *unreached = object;
+
+            object = object->next;
+            if (previous)
+                previous->next = object;
+            else
+                vm.objects = object;
+
+            freeObject(unreached);
+        }
+    }
+}
+
 void collectGarbage(void)
 {
 #ifdef DEBUG_LOC_GC
@@ -163,6 +187,8 @@ void collectGarbage(void)
 #endif
     markRoots();
     traceReferences();
+    tableRemoveWhite(&vm.strings);
+    sweep();
 
 #ifdef DEBUG_LOG_GC
     printf("-- gc end\n");

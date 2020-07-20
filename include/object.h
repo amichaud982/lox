@@ -27,11 +27,12 @@ typedef enum
     OBJ_STRING,
 } ObjType;
 
-struct sObj
+typedef struct sObj
 {
     ObjType type;
+    bool isMarked;
     struct sObj *next;
-};
+} Obj;
 
 typedef struct
 {

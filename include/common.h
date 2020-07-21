@@ -12,4 +12,5 @@
 #define DEBUG_STRESS_GC
 #define DEBUG_LOG_GC
 
+#undef DEBUG_STRESS_GC
 #endif

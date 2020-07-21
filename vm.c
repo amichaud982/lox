@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -11,6 +12,15 @@
 #include "vm.h"
 
 VM vm;
+
+static Value exitNative(int argCount, Value *args)
+{
+	printf("exiting...\n");
+	collectGarbage();
+	freeVM();
+	exit(EXIT_SUCCESS);
+	return NUMBER_VAL(0);
+}
 
 static Value clockNative(int argCount, Value *args)
 {
@@ -73,6 +83,7 @@ void initVM(void)
     initTable(&vm.strings);
 
     defineNative("clock", clockNative);
+	defineNative("exit", exitNative);
 }
 
 void freeVM(void)

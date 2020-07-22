@@ -50,6 +50,7 @@ typedef struct
 typedef enum
 {
     TYPE_FUNCTION,
+    TYPE_METHOD,
     TYPE_SCRIPT
 } FunctionType;
 
@@ -63,5 +64,11 @@ typedef struct Compiler_t
     Upvalue upvalues[UINT8_COUNT];
     int scopeDepth;
 } Compiler;
+
+typedef struct ClassCompiler_t
+{
+    struct ClassCompiler_t *enclosing;
+    Token name;
+} ClassCompiler;
 
 #endif

@@ -2,30 +2,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 
 #include "common.h"
 #include "compiler.h"
 #include "debug.h"
 #include "object.h"
 #include "memory.h"
+#include "nativefunc.h"
 #include "vm.h"
+
+#define NATIVE_FUNCTIONS_COUNT 4
 
 VM vm;
 
-static Value exitNative(int argCount, Value *args)
-{
-	printf("exiting...\n");
-	collectGarbage();
-	freeVM();
-	exit(EXIT_SUCCESS);
-	return NUMBER_VAL(0);
-}
-
-static Value clockNative(int argCount, Value *args)
-{
-    return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
-}
+NativeFunc funcs[] = {
+	{ "clock",	 nativeClock  },			// clock function
+	{ "exit",	 nativeExit   },			// exit function
+	{ "print",	 nativePrint  },			// print function
+	{ "println", nativePrintln},			// println function
+};
 
 static void resetStack(void)
 {
@@ -85,8 +80,8 @@ void initVM(void)
     vm.initString = NULL;
     vm.initString = copyString("init", 4);
 
-    defineNative("clock", clockNative);
-	defineNative("exit", exitNative);
+	for (int i = 0; i < NATIVE_FUNCTIONS_COUNT; ++i)
+		defineNative(funcs[i].name, funcs[i].func);
 }
 
 void freeVM(void)

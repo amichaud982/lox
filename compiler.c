@@ -588,13 +588,13 @@ ParseRule rules[] = {
     { NULL,     NULL,    PREC_NONE },       // TOKEN_IF
     { literal,  NULL,    PREC_NONE },       // TOKEN_NIL
     { NULL,      or_,	 PREC_OR   },       // TOKEN_OR
-    { NULL,     NULL,    PREC_NONE },       // TOKEN_PRINT
     { NULL,     NULL,    PREC_NONE },       // TOKEN_RETURN
     { super_,   NULL,    PREC_NONE },       // TOKEN_SUPER
     { this_,    NULL,    PREC_NONE },       // TOKEN_THIS
     { literal,  NULL,    PREC_NONE },       // TOKEN_TRUE
     { NULL,     NULL,    PREC_NONE },       // TOKEN_VAR
     { NULL,     NULL,    PREC_NONE },       // TOKEN_WHILE
+	{ NULL,		NULL,	 PREC_NONE },		// TOKEN_IMPORT
     { NULL,     NULL,    PREC_NONE },       // TOKEN_ERROR
     { NULL,     NULL,    PREC_NONE },       // TOKEN_EOF
 };
@@ -831,13 +831,6 @@ static void ifStatement(void)
     patchJump(elseJump);
 }
 
-static void printStatement(void)
-{
-    expression();
-    consume(TOKEN_SEMICOLON, "Expect ';' after value.");
-    emitByte(OP_PRINT);
-}
-
 static void returnStatement(void)
 {
     if (current->type == TYPE_SCRIPT)
@@ -888,7 +881,6 @@ static void synchronize(void)
             case TOKEN_FOR:
             case TOKEN_IF:
             case TOKEN_WHILE:
-            case TOKEN_PRINT:
             case TOKEN_RETURN:
                 return;
 
@@ -917,9 +909,9 @@ static void declaration(void)
 
 static void statement(void)
 {
-    if (match(TOKEN_PRINT))
-        printStatement();
-    else if (match(TOKEN_FOR))
+    //if (match(TOKEN_PRINT))
+    //    printStatement();
+    if (match(TOKEN_FOR))
         forStatement();
     else if (match(TOKEN_IF))
         ifStatement();

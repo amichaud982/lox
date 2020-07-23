@@ -62,7 +62,7 @@ static void runFile(const char *path)
 	if (result == INTERPRET_RUNTIME_ERROR) exit(70);
 }
 
-int main(int argc, const char **argv)
+static int loxmain(int argc, const char **argv)
 {
 	// Initialize the VM.
 	initVM();
@@ -78,4 +78,9 @@ int main(int argc, const char **argv)
 
 	freeVM();
     return EXIT_SUCCESS;
+}
+
+int main(int argc, const char **argv)
+{
+	return loxmain(argc, argv);
 }

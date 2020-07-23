@@ -70,6 +70,7 @@ typedef struct ClassCompiler_t
 {
     struct ClassCompiler_t *enclosing;
     Token name;
+    bool hasSuperclass;
 } ClassCompiler;
 
 #endif

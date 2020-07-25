@@ -11,15 +11,16 @@
 #include "nativefunc.h"
 #include "vm.h"
 
-#define NATIVE_FUNCTIONS_COUNT 4
+#define NATIVE_FUNCTIONS_COUNT 5
 
 VM vm;
 
 NativeFunc funcs[] = {
-	{ "clock",	 nativeClock  },			// clock function
-	{ "exit",	 nativeExit   },			// exit function
-	{ "print",	 nativePrint  },			// print function
-	{ "println", nativePrintln},			// println function
+	{ "clock",	 nativeClock   },			// clock function
+	{ "exit",	 nativeExit    },			// exit function
+	{ "print",	 nativePrint   },			// print function
+	{ "println", nativePrintln },			// println function
+    { "input",   nativeInput   },           // getln function
 };
 
 static void resetStack(void)
@@ -59,6 +60,11 @@ static void defineNative(const char *name, NativeFn function)
    push(OBJ_VAL(copyString(name, (int)strlen(name))));
    push(OBJ_VAL(newNative(function)));
    tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
+   /*printf("\n----------------------\n");
+   printValue(vm.stack[0]);
+   printf("\n");
+   printValue(vm.stack[1]);
+   printf("\n----------------------\n");*/
    pop();
    pop();
 }

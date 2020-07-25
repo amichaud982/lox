@@ -29,6 +29,7 @@ typedef enum
 {
     OBJ_BOUND_METHOD,
     OBJ_CLASS,
+    OBJ_NATIVE_CLASS,
     OBJ_CLOSURE,
     OBJ_FUNCTION,
 	OBJ_INSTANCE,

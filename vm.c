@@ -11,7 +11,7 @@
 #include "nativefunc.h"
 #include "vm.h"
 
-#define NATIVE_FUNCTIONS_COUNT 5
+#define NATIVE_FUNCTIONS_COUNT 6
 
 VM vm;
 
@@ -21,6 +21,7 @@ NativeFunc funcs[] = {
 	{ "print",	 nativePrint   },			// print function
 	{ "println", nativePrintln },			// println function
     { "input",   nativeInput   },           // getln function
+    { "type",    nativeType    },           // type function
 };
 
 static void resetStack(void)

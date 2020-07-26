@@ -8,6 +8,59 @@
 #include "value.h"
 #include "vm.h"
 
+Value nativeType(int argCount, Value *args)
+{
+    Value value = args[0];
+    if (argCount > 1) {
+        printf("type() takes only one argument.\n");
+        return NIL_VAL;
+    }
+    else if (argCount == 0) {
+        printf("type() takes one argument.\n");
+        return NIL_VAL;
+    }
+    
+    char *msg;
+    if (IS_OBJ(value)) {
+        switch (OBJ_TYPE(value)) {
+            case OBJ_BOUND_METHOD:
+                msg = "<ObjBoundMethod>";
+                break;
+            case OBJ_CLASS:
+                msg = "<ObjClass>";
+                break;
+            case OBJ_CLOSURE:
+                msg = "<ObjClosure>";
+                break;
+            case OBJ_FUNCTION:
+                msg = "<ObjFunction>";
+                break;
+            case OBJ_INSTANCE:
+                msg = "<ObjInstance>";
+                break;
+            case OBJ_NATIVE:
+                msg = "<ObjNative>";
+                break;
+            case OBJ_UPVALUE:
+                msg = "<ObjUpvalue>";
+                break;
+            case OBJ_STRING:
+                msg = "<ObjString>";
+                break;
+        }
+    }
+    else if (IS_BOOL(value))
+        msg = "<bool>";
+    else if (IS_NIL(value))
+        msg = "<nil>";
+    else if (IS_NUMBER(value))
+        msg = "<number>";
+    else
+        msg = "unknown type";
+
+    return OBJ_VAL(copyString(msg, strlen(msg)));
+}
+
 Value nativeExit(int argCount, Value *args)
 {
 	printf("exiting...\n");

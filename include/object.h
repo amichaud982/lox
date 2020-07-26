@@ -25,7 +25,11 @@
 #define AS_STRING(value)        ((ObjString*)AS_OBJ(value))
 #define AS_CSTRING(value)       (((ObjString*)AS_OBJ(value))->chars)
 
-typedef enum
+#define ALLOCATE_OBJ(type, objectType) \
+    (type*)allocateObject(sizeof(type), objectType)
+
+
+    typedef enum
 {
     OBJ_BOUND_METHOD,
     OBJ_CLASS,
@@ -107,6 +111,7 @@ typedef struct
     ObjClosure *method;
 } ObjBoundMethod;
 
+Obj *allocateObject(size_t size, ObjType type);
 ObjBoundMethod *newBoundMethod(Value receiver, ObjClosure *method);
 ObjClass *newClass(ObjString *name);
 ObjClosure *newClosure(ObjFunction *function);
